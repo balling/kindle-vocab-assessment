@@ -4,7 +4,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 CHECKPOINT_DIR = os.path.join(os.path.dirname(__file__), 'checkpoints')
 
 TRAINING_PARAMS = {
-    'batch_size': 100,
+    'batch_size': 1000,
     'epochs': 10,       # number of loops through synthetic data
     'lr': 1e-3,         # learning rate
     'ability_weight': 10,  # weight of ability loss
