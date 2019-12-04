@@ -93,11 +93,11 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
         ability_pred_arr = np.concatenate(ability_pred_arr).flatten()
 
         word_acc = np.mean(word_pred_arr == word_label_arr)
-        ability_acc = np.mean(ability_pred_arr == ability_pred_arr)
+        ability_acc = np.mean(ability_pred_arr == ability_label_arr)
         word_f1 = f1_score(word_label_arr, word_pred_arr)
         ability_f1 = f1_score(ability_label_arr, ability_pred_arr, average='micro')
 
-        print('====> Epoch: {}\tLoss: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}'.format(
+        print('====> Epoch: {}\tLoss: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}\tAbility Accuracy: {:.4f}\tAbility F1: {:.4f}'.format(
             epoch, loss_meter.avg, word_acc, word_f1, ability_acc, ability_f1))
         
         return loss_meter.avg, word_acc, word_f1, ability_acc, ability_f1
@@ -140,17 +140,13 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
         word_pred_arr = np.concatenate(word_pred_arr).flatten()
         ability_label_arr = np.concatenate(ability_label_arr).flatten()
         ability_pred_arr = np.concatenate(ability_pred_arr).flatten()
-        # word_label_arr = np.vstack(word_label_arr).flatten()
-        # ability_label_arr = np.vstack(ability_label_arr).flatten()
-        # word_pred_arr = np.vstack(word_pred_arr).flatten()
-        # ability_pred_arr = np.vstack(ability_pred_arr).flatten()
 
         word_acc = np.mean(word_pred_arr == word_label_arr)
-        ability_acc = np.mean(ability_pred_arr == ability_pred_arr)
+        ability_acc = np.mean(ability_pred_arr == ability_label_arr)
         word_f1 = f1_score(word_label_arr, word_pred_arr)
         ability_f1 = f1_score(ability_label_arr, ability_pred_arr, average='micro')
 
-        print('====> {} Epoch: {}\tLoss: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}'.format(
+        print('====> {} Epoch: {}\tLoss: {:.4f}\tWord Accuracy: {:.4f}\tWord F1: {:.4f}\tAbility Accuracy: {:.4f}\tAbility F1: {:.4f}'.format(
             name, epoch, loss_meter.avg, word_acc, word_f1, ability_acc, ability_f1))
         
         return loss_meter.avg, word_acc, word_f1, ability_acc, ability_f1
