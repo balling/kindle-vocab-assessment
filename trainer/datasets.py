@@ -107,7 +107,7 @@ class LookupDataset(Dataset):
         token_seq, lookup_seq, seen_seq, token_len = self.token_seqs[
             index], self.lookup_seqs[index], self.seen_seqs[index], self.token_lens[index]
         token_seq = torch.from_numpy(
-            np.array([seen_seq, lookup_seq, token_seq])).long()
+            np.array([seen_seq, lookup_seq, token_seq])).float()
         word_label = self.word_labels[index]
         ability_label = self.ability_labels[index]
         return token_seq, token_len, word_label, ability_label

@@ -58,18 +58,18 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
             token_seq = token_seq.to(device)  # sequence of token indexes
             token_len = token_len.to(device)  # length of a non-padded sentence
             word_label = word_label.to(device)
-            ability_label = ability_label.to(device)
+            ability_label = ability_label.to(device).long()
 
             optimizer.zero_grad()
             word_label_out, ability_label_out = model(token_seq, token_len)  # label_out is the prediction
-            loss = F.binary_cross_entropy(word_label_out, word_label) + F.binary_cross_entropy(ability_label_out, ability_label) # same loss as in IRT!
+            loss = F.binary_cross_entropy(word_label_out, word_label) + F.cross_entropy(ability_label_out, ability_label) # same loss as in IRT!
 
-            # loss.backward()
+            loss.backward()
             loss_meter.update(loss.item(), batch_size)
 
             word_pred_npy = torch.round(word_label_out).detach().numpy()
             word_label_npy = word_label.detach().numpy()
-            ability_pred_npy = torch.round(ability_label_out).detach().numpy()
+            ability_pred_npy = ability_label_out.argmax(1).detach().numpy()
             ability_label_npy = ability_label.detach().numpy()
 
             optimizer.step()
@@ -82,7 +82,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
             ability_label_arr.append(ability_label_npy)
             ability_pred_arr.append(ability_pred_npy)
 
-            pbar.set_postfix({'Loss': loss_meter.avg, 'Word Accuracy': word_acc_meter.avg, 'Ability Accuracy': ability_acc_meter.avg})
+            pbar.set_postfix({'Loss': '{:.4f}'.format(loss_meter.avg), 'Word Accuracy': word_acc_meter.avg, 'Ability Accuracy': ability_acc_meter.avg})
             pbar.update()
 
         pbar.close()
@@ -117,15 +117,15 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
                     token_seq = token_seq.to(device)  # sequence of token indexes
                     token_len = token_len.to(device)  # length of a non-padded sentence
                     word_label = word_label.to(device)
-                    ability_label = ability_label.to(device)
+                    ability_label = ability_label.to(device).long()
 
                     word_label_out, ability_label_out = model(token_seq, token_len)
-                    loss = F.binary_cross_entropy(word_label_out, word_label) + F.binary_cross_entropy(ability_label_out, ability_label)
+                    loss = F.binary_cross_entropy(word_label_out, word_label) + F.cross_entropy(ability_label_out, ability_label)
                     loss_meter.update(loss.item(), batch_size)
 
                     word_pred_npy = torch.round(word_label_out).detach().numpy()
                     word_label_npy = word_label.detach().numpy()
-                    ability_pred_npy = torch.round(ability_label_out).detach().numpy()
+                    ability_pred_npy = ability_label_out.argmax(1).detach().numpy()
                     ability_label_npy = ability_label.detach().numpy()
 
                     word_label_arr.append(word_label_npy)

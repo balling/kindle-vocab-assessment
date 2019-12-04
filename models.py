@@ -10,7 +10,8 @@ import torch.nn.utils.rnn as rnn_utils
 
 PAD_IDX = 0
 EMBED_SIZE = 3
-HIDDEN_SIZE = 64
+HIDDEN_SIZE = 32
+N_CLASS = 13
 
 class PlainRNN(nn.Module):
     """
@@ -26,9 +27,9 @@ class PlainRNN(nn.Module):
         super().__init__()
         # These modules define trainable parameters. Put things here like
         #   nn.Linear, nn.RNN, nn.Embedding
-        self.embedding = nn.Embedding(vocab_size, EMBED_SIZE, PAD_IDX)
-        # self.rnn = nn.LSTM(EMBED_SIZE, HIDDEN_SIZE, bidirectional=True)
-        # self.projection = nn.Linear(2 * HIDDEN_SIZE, num_labels)
+        # self.embedding = nn.Embedding(vocab_size, EMBED_SIZE, PAD_IDX)
+        self.rnn = nn.LSTM(EMBED_SIZE, HIDDEN_SIZE, bidirectional=True)
+        self.projection = nn.Linear(2 * HIDDEN_SIZE, N_CLASS)
 
     def forward(self, token_seq, token_length):
         """
@@ -52,10 +53,11 @@ class PlainRNN(nn.Module):
             This will be given to F.binary_cross_entropy(...), just like IRT!
         """
         # embeddings = self.embedding(token_seq) # batch_size x max_seq_length x embed_size
-        # packed = rnn_utils.pack_padded_sequence(embeddings, token_length, batch_first=True, enforce_sorted=False)
-        # hiddens, (last_hidden, last_cell) = self.rnn(packed)
+        embeddings = token_seq.permute(0, 2, 1)
+        packed = rnn_utils.pack_padded_sequence(embeddings, token_length, batch_first=True, enforce_sorted=False)
+        hiddens, (last_hidden, last_cell) = self.rnn(packed)
         # # hiddens = rnn_utils.pad_packed_sequence(hiddens, batch_first=True, enforce_sorted=False)[0] # batch_size x max_seq_length x 2 hidden_size
-        # score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1)) # batch_size x num_labels
-        a,b,c=token_seq.size()
-        return torch.zeros(a, c).float(), torch.zeros_like(token_length).float()
+        score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1)) # batch_size x num_labels
+        batch_size, embed_size, max_seq_length = token_seq.size()
+        return torch.zeros(batch_size, max_seq_length).float(), score
         # return torch.sigmoid(score)
