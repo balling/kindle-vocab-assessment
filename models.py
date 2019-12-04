@@ -13,6 +13,7 @@ EMBED_SIZE = 3
 HIDDEN_SIZE = 32
 N_CLASS = 13
 
+
 class PlainRNN(nn.Module):
     """
     Neural network responsible for ingesting a tokenized student 
@@ -22,7 +23,7 @@ class PlainRNN(nn.Module):
         vocab_size: number of unique tokens 
         num_labels: number of output feedback labels
     """
-    
+
     def __init__(self, vocab_size, num_labels):
         super().__init__()
         # These modules define trainable parameters. Put things here like
@@ -30,6 +31,7 @@ class PlainRNN(nn.Module):
         # self.embedding = nn.Embedding(vocab_size, EMBED_SIZE, PAD_IDX)
         self.rnn = nn.LSTM(EMBED_SIZE, HIDDEN_SIZE, bidirectional=True)
         self.projection = nn.Linear(2 * HIDDEN_SIZE, N_CLASS)
+        self.word_projection = nn.Linear(2 * HIDDEN_SIZE, 1)
 
     def forward(self, token_seq, token_length):
         """
@@ -38,7 +40,7 @@ class PlainRNN(nn.Module):
         @param token_seq: batch_size x max_seq_length
             Example: torch.Tensor([[0,6,2,3],[0,2,5,3], ...])
             These define your PADDED programs after tokenization.
-        
+
         @param token_length: batch_size
             Example: torch.Tensor([4,4, ...])
             These define your unpadded program lengths.
@@ -56,8 +58,9 @@ class PlainRNN(nn.Module):
         embeddings = token_seq.permute(0, 2, 1)
         packed = rnn_utils.pack_padded_sequence(embeddings, token_length, batch_first=True, enforce_sorted=False)
         hiddens, (last_hidden, last_cell) = self.rnn(packed)
-        # # hiddens = rnn_utils.pad_packed_sequence(hiddens, batch_first=True, enforce_sorted=False)[0] # batch_size x max_seq_length x 2 hidden_size
-        score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1)) # batch_size x num_labels
-        batch_size, embed_size, max_seq_length = token_seq.size()
-        return torch.zeros(batch_size, max_seq_length).float(), score
-        # return torch.sigmoid(score)
+        hiddens = rnn_utils.pad_packed_sequence(hiddens, batch_first=True)[0]  # batch_size x max_seq_length x 2 hidden_size
+        # batch_size x num_labels
+        score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1))
+        word_scores = self.word_projection(hiddens).squeeze(2)
+        # batch_size, embed_size, max_seq_length = token_seq.size()
+        return torch.sigmoid(word_scores), score

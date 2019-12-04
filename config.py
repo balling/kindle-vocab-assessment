@@ -7,6 +7,7 @@ TRAINING_PARAMS = {
     'batch_size': 100,
     'epochs': 10,       # number of loops through synthetic data
     'lr': 1e-3,         # learning rate
+    'ability_weight': 10,  # weight of ability loss
     'seed': 1,
     'max_seq_len': 50,  # maximum number of tokens allowed in a single sequence
     'min_occ': 1,       # minimum number of occurences to add a token into the vocab
