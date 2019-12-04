@@ -15,7 +15,11 @@ from .datasets import LookupDataset
 
 
 def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_path, val_user_path, test_lookup_path, test_user_path, config):
-    device = torch.device('cpu')  # no CUDA support for now
+    if torch.cuda.is_available():
+        device = torch.device('cuda:0')
+        torch.cuda.set_device(device)
+    else:
+        device = torch.device('cpu')
 
     # reproducibility
     torch.manual_seed(config['seed'])
@@ -62,7 +66,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
 
             optimizer.zero_grad()
             word_label_out, ability_label_out = model(token_seq, token_len)  # label_out is the prediction
-            loss = F.binary_cross_entropy(word_label_out, word_label) + F.cross_entropy(ability_label_out, ability_label) # same loss as in IRT!
+            loss = F.binary_cross_entropy(word_label_out, word_label) + config['ability_weight'] * F.cross_entropy(ability_label_out, ability_label)
 
             loss.backward()
             loss_meter.update(loss.item(), batch_size)
@@ -120,7 +124,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
                     ability_label = ability_label.to(device).long()
 
                     word_label_out, ability_label_out = model(token_seq, token_len)
-                    loss = F.binary_cross_entropy(word_label_out, word_label) + F.cross_entropy(ability_label_out, ability_label)
+                    loss = F.binary_cross_entropy(word_label_out, word_label) + config['ability_weight'] * F.cross_entropy(ability_label_out, ability_label)
                     loss_meter.update(loss.item(), batch_size)
 
                     word_pred_npy = torch.round(word_label_out).detach().numpy()
