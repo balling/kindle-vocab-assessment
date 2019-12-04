@@ -12,5 +12,6 @@ TRAINING_PARAMS = {
     'max_seq_len': 50,  # maximum number of tokens allowed in a single sequence
     'min_occ': 1,       # minimum number of occurences to add a token into the vocab
     'out_dir': CHECKPOINT_DIR,  # where to train the model
-    'vocab_path': os.path.join(DATA_DIR, 'vocab.pickle')
+    'vocab_path': os.path.join(DATA_DIR, 'vocab.pickle'),
+    'levels_path': os.path.join(DATA_DIR, 'word-levels.json')
 }

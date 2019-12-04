@@ -9,7 +9,7 @@ import torch.nn.utils.rnn as rnn_utils
 # from trainer.utils import NUM_LABELS, IX_TO_LABEL
 
 PAD_IDX = 0
-EMBED_SIZE = 3
+EMBED_SIZE = 4
 HIDDEN_SIZE = 32
 N_CLASS = 13
 

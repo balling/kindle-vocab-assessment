@@ -31,9 +31,9 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
 
     # load the dataset! this might be new for you guys but usually, we wrap
     # data into Dataset classes. 
-    train_dataset = LookupDataset(train_lookup_path, train_user_path, vocab_path=config['vocab_path'], max_seq_len=config['max_seq_len'])
-    val_dataset = LookupDataset(val_lookup_path, val_user_path, vocab_path=config['vocab_path'], max_seq_len=config['max_seq_len'])
-    test_dataset = LookupDataset(test_lookup_path, test_user_path, vocab_path=config['vocab_path'], max_seq_len=config['max_seq_len'])
+    train_dataset = LookupDataset(train_lookup_path, train_user_path, vocab_path=config['vocab_path'], levels_path=config['levels_path'], max_seq_len=config['max_seq_len'])
+    val_dataset = LookupDataset(val_lookup_path, val_user_path, vocab_path=config['vocab_path'], levels_path=config['levels_path'], max_seq_len=config['max_seq_len'])
+    test_dataset = LookupDataset(test_lookup_path, test_user_path, vocab_path=config['vocab_path'], levels_path=config['levels_path'], max_seq_len=config['max_seq_len'])
 
     # We use a Loader that wraps around a Dataset class to return minibatches...
     # "shuffle" means we randomly pick rows from the full set. We only do this in training
