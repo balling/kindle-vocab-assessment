@@ -18,6 +18,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
     if torch.cuda.is_available():
         device = torch.device('cuda:0')
         torch.cuda.set_device(device)
+        print('using gpu')
     else:
         device = torch.device('cpu')
 
@@ -71,10 +72,10 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
             loss.backward()
             loss_meter.update(loss.item(), batch_size)
 
-            word_pred_npy = torch.round(word_label_out).detach().numpy()
-            word_label_npy = word_label.detach().numpy()
-            ability_pred_npy = ability_label_out.argmax(1).detach().numpy()
-            ability_label_npy = ability_label.detach().numpy()
+            word_pred_npy = torch.round(word_label_out).detach().cpu().numpy()
+            word_label_npy = word_label.detach().cpu().numpy()
+            ability_pred_npy = ability_label_out.argmax(1).detach().cpu().numpy()
+            ability_label_npy = ability_label.detach().cpu().numpy()
 
             optimizer.step()
             word_acc = np.mean(word_pred_npy == word_label_npy)
@@ -127,10 +128,10 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
                     loss = F.binary_cross_entropy(word_label_out, word_label) + config['ability_weight'] * F.cross_entropy(ability_label_out, ability_label)
                     loss_meter.update(loss.item(), batch_size)
 
-                    word_pred_npy = torch.round(word_label_out).detach().numpy()
-                    word_label_npy = word_label.detach().numpy()
-                    ability_pred_npy = ability_label_out.argmax(1).detach().numpy()
-                    ability_label_npy = ability_label.detach().numpy()
+                    word_pred_npy = torch.round(word_label_out).detach().cpu().numpy()
+                    word_label_npy = word_label.detach().cpu().numpy()
+                    ability_pred_npy = ability_label_out.argmax(1).detach().cpu().numpy()
+                    ability_label_npy = ability_label.detach().cpu().numpy()
 
                     word_label_arr.append(word_label_npy)
                     word_pred_arr.append(word_pred_npy)
