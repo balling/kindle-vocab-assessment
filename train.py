@@ -10,10 +10,10 @@ import trainer
 
 
 if __name__ == "__main__":
-    # train_lookup_path = os.path.join(DATA_DIR, 'lookups-tiny.pickle')
-    # train_user_path = os.path.join(DATA_DIR, 'users-tiny.pickle')
-    train_lookup_path = os.path.join(DATA_DIR, 'lookups-test.pickle')
-    train_user_path = os.path.join(DATA_DIR, 'users-test.pickle')
+    train_lookup_path = os.path.join(DATA_DIR, 'lookups-tiny.pickle')
+    train_user_path = os.path.join(DATA_DIR, 'users-tiny.pickle')
+    # train_lookup_path = os.path.join(DATA_DIR, 'lookups-test.pickle')
+    # train_user_path = os.path.join(DATA_DIR, 'users-test.pickle')
     val_lookup_path = os.path.join(DATA_DIR, 'lookups-teeny.pickle')
     val_user_path = os.path.join(DATA_DIR, 'users-teeny.pickle')
     test_lookup_path = os.path.join(DATA_DIR, 'lookups-test.pickle')
