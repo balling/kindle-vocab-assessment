@@ -2,6 +2,7 @@ import os
 import sys
 import random
 import numpy as np
+import pickle
 from tqdm import tqdm
 from sklearn.metrics import f1_score
 
@@ -42,8 +43,13 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
     val_loader = data.DataLoader(val_dataset, batch_size=config['batch_size'], shuffle=False)
     test_loader = data.DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False)
 
+    with open(config['embed_weight_path'], 'rb') as fp:
+        embedding_weight = pickle.load(fp)
+
+    embedding_weight = torch.from_numpy(embedding_weight)
+
     # this instantiates our model
-    model = model_class(vocab_size=2, num_labels=3)
+    model = model_class(weight=embedding_weight, vocab_size=2, num_labels=3)
     model = model.to(device)
     # initialize our optimizer
     optimizer = optim.Adam(model.parameters(), lr=config['lr'])
