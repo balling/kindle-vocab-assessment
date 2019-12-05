@@ -10,7 +10,7 @@ import torch.nn.utils.rnn as rnn_utils
 
 PAD_IDX = 0
 EMBED_SIZE = 303
-HIDDEN_SIZE = 128
+HIDDEN_SIZE = 32
 N_CLASS = 13
 
 
