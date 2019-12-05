@@ -49,7 +49,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
     embedding_weight = torch.from_numpy(embedding_weight)
 
     # this instantiates our model
-    model = model_class(weight=embedding_weight, vocab_size=2, num_labels=3)
+    model = model_class(weight=embedding_weight, max_seq_length=config['max_seq_len'])
     model = model.to(device)
     # initialize our optimizer
     optimizer = optim.Adam(model.parameters(), lr=config['lr'])
