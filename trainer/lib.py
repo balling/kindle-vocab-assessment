@@ -47,6 +47,7 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
     model = model.to(device)
     # initialize our optimizer
     optimizer = optim.Adam(model.parameters(), lr=config['lr'])
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.2, patience=3)
 
 
     def train(epoch):
@@ -180,6 +181,8 @@ def train_pipeline(model_class, train_lookup_path, train_user_path, val_lookup_p
         val_loss, val_word_acc, val_word_f1, val_ability_acc, val_ability_f1 = test(epoch, val_loader, name='Val')
         # the test set is whats actually reported 
         test_loss, test_word_acc, test_word_f1, test_ability_acc, test_ability_f1 = test(epoch, test_loader, name='Test')
+
+        scheduler.step(val_loss)
         
         track_train_loss[epoch - 1] = train_loss
         track_val_loss[epoch - 1] = val_loss
