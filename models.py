@@ -9,7 +9,8 @@ import torch.nn.utils.rnn as rnn_utils
 # from trainer.utils import NUM_LABELS, IX_TO_LABEL
 
 PAD_IDX = 0
-EMBED_SIZE = 303
+EMBED_SIZE = 4
+# EMBED_SIZE = 303
 HIDDEN_SIZE = 32
 N_CLASS = 13
 
@@ -55,10 +56,11 @@ class PlainRNN(nn.Module):
             This will be given to F.binary_cross_entropy(...), just like IRT!
         """
         # embeddings = self.embedding(token_seq) # batch_size x max_seq_length x embed_size
-        seq = token_seq.permute(0, 2, 1)
+        # seq = token_seq.permute(0, 2, 1)
+        embeddings = token_seq.permute(0, 2, 1)
         # seen_seq, lookup_seq, level_seq, token_seq
-        embeddings = self.embedding(seq[:, :, 3].long()).float()
-        embeddings = torch.cat((embeddings, seq[:, :, 0:3],), 2)
+        # embeddings = self.embedding(seq[:, :, 3].long()).float()
+        # embeddings = torch.cat((embeddings, seq[:, :, 0:3],), 2)
         packed = rnn_utils.pack_padded_sequence(embeddings, token_length, batch_first=True, enforce_sorted=False)
         hiddens, (last_hidden, last_cell) = self.rnn(packed)
         hiddens = rnn_utils.pad_packed_sequence(hiddens, batch_first=True)[0]  # batch_size x max_seq_length x 2 hidden_size
