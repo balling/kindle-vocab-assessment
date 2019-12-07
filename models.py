@@ -31,7 +31,8 @@ class PlainRNN(nn.Module):
         #   nn.Linear, nn.RNN, nn.Embedding
         self.embedding = nn.Embedding.from_pretrained( weight, padding_idx=PAD_IDX)
         self.rnn = nn.LSTM(EMBED_SIZE, HIDDEN_SIZE, bidirectional=True)
-        self.projection = nn.Linear(2 * HIDDEN_SIZE, N_CLASS)
+        self.projection = nn.Linear(2 * HIDDEN_SIZE * max_seq_length, HIDDEN_SIZE)
+        self.projection2 = nn.Linear(HIDDEN_SIZE, N_CLASS)
         self.word_projection = nn.Linear(2 * HIDDEN_SIZE, 1)
 
     def forward(self, token_seq, token_length):
@@ -65,9 +66,10 @@ class PlainRNN(nn.Module):
         hiddens, (last_hidden, last_cell) = self.rnn(packed)
         hiddens = rnn_utils.pad_packed_sequence(hiddens, batch_first=True)[0]  # batch_size x max_seq_length x 2 hidden_size
         # batch_size x num_labels
-        score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1))
+        # score = self.projection(torch.cat((last_hidden[0], last_hidden[1]), 1))
         word_scores = self.word_projection(hiddens).squeeze(2)
-        # batch_size, embed_size, max_seq_length = token_seq.size()
+        batch_size, embed_size, max_seq_length = token_seq.size()
+        score = self.projection2(F.relu(self.projection(hiddens.reshape(batch_size, -1))))
         return torch.sigmoid(word_scores), score
 
 
