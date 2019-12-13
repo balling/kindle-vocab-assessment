@@ -128,6 +128,8 @@ class NaiveModel(nn.Module):
         self.projection = nn.Linear(1, N_CLASS)
 
     def forward(self, token_seq, token_length):
-        word_scores = (token_seq[:, :, 1] > 0).float()
-        score = self.projection(torch.sum(token_seq[:, :, 2] * word_scores, [1,2])/torch.sum(word_scores, [1,2]))
-        return word_scores, score
+        word_scores = (token_seq[:, 1, :] > 0).float()
+        mean_difficulty = torch.sum(token_seq[:, 2, :] * word_scores, 1)/torch.sum(word_scores, 1)
+        mean_difficulty[mean_difficulty!=mean_difficulty] = N_CLASS
+        score = self.projection(mean_difficulty.unsqueeze(1))
+        return -word_scores * 0.9 + 0.95, score
