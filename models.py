@@ -120,3 +120,14 @@ class LinearModel(nn.Module):
         word_scores = self.word_projection(seq).squeeze(2)
         # batch_size, embed_size, max_seq_length = token_seq.size()
         return torch.sigmoid(word_scores), score
+
+
+class NaiveModel(nn.Module):
+    def __init__(self, weight, max_seq_length):
+        super().__init__()
+        self.projection = nn.Linear(1, N_CLASS)
+
+    def forward(self, token_seq, token_length):
+        word_scores = (token_seq[:, :, 1] > 0).float()
+        score = self.projection(torch.sum(token_seq[:, :, 2] * word_scores, [1,2])/torch.sum(word_scores, [1,2]))
+        return word_scores, score
